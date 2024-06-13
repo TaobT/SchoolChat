@@ -1,0 +1,33 @@
+.p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .p-field {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .p-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  input {
+    width: calc(100% - 1rem); /* Ajusta el ancho del input */
+    padding: 0.5rem;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #484b51;
+    color: #ffffff;
+  }
+  
+  button {
+    cursor: pointer;
+    margin-left: 0.5rem; /* Ajusta el espaciado entre botones */
+  }
+  

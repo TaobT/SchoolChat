@@ -1,0 +1,12 @@
+<p-dialog header="Unirse a un Servidor" [(visible)]="displayModal" [modal]="true" [closable]="false">
+    <div class="p-dialog-content">
+      <div class="p-field">
+        <label for="joinCode">Código de Invitación</label>
+        <input id="joinCode" type="text" pInputText [(ngModel)]="joinCode" />
+      </div>
+      <div class="p-dialog-buttons">
+        <button pButton type="button" label="Cancelar" (click)="displayModal = false"></button>
+        <button pButton type="button" label="Unirse" (click)="joinServer()"></button>
+      </div>
+    </div>
+  </p-dialog>
