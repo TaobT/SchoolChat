@@ -1,9 +1,9 @@
 # Setup:
 - Node.js y npm v20.13.1
 - Angular v17.3.9
-- Firebase Realtime (Mensajeria)
-- Firebase Firestore
-- Firebase Storage
+- CloudWatch AWS (Mensajeria)
+- Dynamo DB AWS
+- S3 AWS
 - Nginx
 - HTTPS
 
