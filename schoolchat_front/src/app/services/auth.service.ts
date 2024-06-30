@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'http://localhost:3000/api/auth';
 
   constructor(private http: HttpClient, private router: Router, private jwtHelper: JwtHelperService) {}
 
@@ -20,7 +21,11 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post(`${this.apiUrl}/login`, { email, password });
+    return this.http.post(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap((res: any) => {
+        localStorage.setItem('token', res.token);
+      }
+    ));
   }
 
   isAuthenticated(): boolean {

@@ -15,7 +15,7 @@ export class CompleteRegistrationComponent {
       userId: ['', Validators.required],
       username: ['', Validators.required],
       realName: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)]]
     });
   }
 
