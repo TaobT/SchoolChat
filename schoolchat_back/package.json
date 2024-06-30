@@ -7,5 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "keywords": [],
+  "dependencies": {
+    "@auth0/angular-jwt": "^5.2.0",
+    "@aws-sdk/client-dynamodb": "^3.606.0",
+    "@aws-sdk/client-s3": "^3.606.0",
+    "aws-sdk": "^2.1651.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^10.0.0"
+  }
 }
