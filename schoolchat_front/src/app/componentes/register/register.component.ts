@@ -21,9 +21,7 @@ export class RegisterComponent {
   register() {
     if (this.registerForm.valid) {
       const { email, socialLogin } = this.registerForm.value;
-      this.authService.register(email, socialLogin).subscribe(response => {
-        this.router.navigate(['complete-registration']);
-      });
+      this.authService.register(email, socialLogin);
     }
   }
 }

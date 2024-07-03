@@ -22,7 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatCardModule } from '@angular/material/card';	
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -52,6 +52,7 @@ export function tokenGetter() {
     MatButtonModule,
     MatIconModule,
     HttpClientModule,
+    MatCardModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,

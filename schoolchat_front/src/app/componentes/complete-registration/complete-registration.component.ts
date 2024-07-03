@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { PasswordMatchValidator } from '../../validators/passwordValidator';
 
 @Component({
   selector: 'app-complete-registration',
@@ -9,20 +10,39 @@ import { AuthService } from '../../services/auth.service';
 })
 export class CompleteRegistrationComponent {
   completeRegistrationForm: FormGroup;
+  password: any;
+  confirmPassword: any;
+  userId: any;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.completeRegistrationForm = this.fb.group({
-      userId: ['', Validators.required],
       username: ['', Validators.required],
       realName: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)]]
-    });
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: PasswordMatchValidator }
+  );
+  }
+
+  ngOnInit() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.authService.verifyToken(token).subscribe((response: any) => {
+        this.userId = response.userId;
+      }, () => {
+        console.log('Token inválido');
+      }
+    );
+    }
+    else {
+      console.log('No hay token');
+    }
   }
 
   completeRegistration() {
     if (this.completeRegistrationForm.valid) {
-      const { userId, username, realName, password } = this.completeRegistrationForm.value;
-      this.authService.completeRegistration(userId, username, realName, password).subscribe(response => {
+      const { username, realName, password } = this.completeRegistrationForm.value;
+      this.authService.completeRegistration(this.userId, username, realName, password).subscribe(response => {
         console.log('Registro completado');
       });
     }
