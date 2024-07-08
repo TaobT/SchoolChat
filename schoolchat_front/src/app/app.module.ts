@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SidebarComponent } from './componentes/sidebar/sidebar.component';
+//Componentes
 import { JoinServerComponent } from './componentes/join-server/join-server.component';
 import { LoginComponent } from './componentes/login/login.component';
 import { RegisterComponent } from './componentes/register/register.component';
@@ -23,7 +24,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCard, MatCardModule } from '@angular/material/card';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';	
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { ChatComponent } from './componentes/chat/chat.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -34,6 +36,7 @@ export function tokenGetter() {
     AppComponent,
     SidebarComponent,
     JoinServerComponent,
+    ChatComponent,
     LoginComponent,
     RegisterComponent,
     HomeComponent,
