@@ -1,22 +1,41 @@
-<div class="chat-container">
-    <div class="chat-header">
-      <h2>Chat Room</h2>
-    </div>
-    <div class="chat-messages" #messageContainer>
-      <div class="message" *ngFor="let message of messages">
-        <div class="message-avatar">
-          <img [src]="message.avatar" alt="Avatar">
-        </div>
-        <div class="message-content">
-          <div class="message-user">{{ message.user }}</div>
-          <div class="message-text">{{ message.text }}</div>
-          <div class="message-time">{{ message.time }}</div>
-        </div>
+<div class="chat-container" *ngIf="username">
+  <div class="chat-header">
+    <h2>Chat Room</h2>
+    <button class="change-user-button" (click)="changeUsername()">Change User</button>
+  </div>
+  <div class="chat-messages" #messageContainer>
+    <div class="message" *ngFor="let message of messages">
+      <div class="message-avatar">
+        <img [src]="message.avatar" alt="Avatar">
+      </div>
+      <div class="message-content">
+        <div class="message-user">{{ message.user }}</div>
+        <div class="message-text">{{ message.text }}</div>
+        <div class="message-time">{{ message.time }}</div>
       </div>
     </div>
-    <div class="chat-input">
-      <input [(ngModel)]="newMessage" placeholder="Type your message..." (keyup.enter)="sendMessage()">
-      <button (click)="sendMessage()">Send</button>
-    </div>
   </div>
-  
+  <div class="chat-input">
+    <input [(ngModel)]="newMessage" placeholder="Type your message..." (keyup.enter)="sendMessage()">
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Modal para ingresar el nombre al iniciar -->
+<div class="username-modal" *ngIf="showUsernameModal">
+  <div class="modal-content">
+    <h2>Enter your name</h2>
+    <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="setUsername()">
+    <button (click)="setUsername()">Join Chat</button>
+  </div>
+</div>
+
+<!-- Modal para cambiar de usuario -->
+<div class="change-user-modal" *ngIf="changeUserModal">
+  <div class="modal-content">
+    <h2>Enter your name</h2>
+    <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="confirmChangeUsername()">
+    <button (click)="confirmChangeUsername()">Join Chat</button>
+    <button (click)="cancelChangeUsername()">Cancel</button>
+  </div>
+</div>

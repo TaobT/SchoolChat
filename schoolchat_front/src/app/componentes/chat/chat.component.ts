@@ -3,20 +3,24 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.css'
+  styleUrls: ['./chat.component.css']
 })
 export class ChatComponent {
   @ViewChild('messageContainer') messageContainer!: ElementRef;
   messages: { user: string, avatar: string, text: string, time: string }[] = [
-    { user: 'Alice', avatar: 'https://via.placeholder.com/40', text: 'Hello!', time: '10:00 AM' },
-    { user: 'Bob', avatar: 'https://via.placeholder.com/40', text: 'Hi there!', time: '10:01 AM' }
+    { user: 'Oscar', avatar: 'https://via.placeholder.com/40', text: 'Hello!', time: '10:00 AM' },
+    { user: 'Omar', avatar: 'https://via.placeholder.com/40', text: 'Hi there!', time: '10:01 AM' }
   ];
   newMessage: string = '';
+  username: string | null = null;
+  tempUsername: string = '';
+  showUsernameModal: boolean = true;
+  changeUserModal: boolean = false;
 
   sendMessage() {
-    if (this.newMessage.trim()) {
+    if (this.newMessage.trim() && this.username) {
       this.messages.push({
-        user: 'You',
+        user: this.username,
         avatar: 'https://via.placeholder.com/40',
         text: this.newMessage,
         time: new Date().toLocaleTimeString()
@@ -26,5 +30,28 @@ export class ChatComponent {
         this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
       }, 0);
     }
+  }
+
+  setUsername() {
+    if (this.tempUsername.trim()) {
+      this.username = this.tempUsername.trim();
+      this.showUsernameModal = false;
+    }
+  }
+
+  changeUsername() {
+    this.tempUsername = '';
+    this.changeUserModal = true;
+  }
+
+  confirmChangeUsername() {
+    if (this.tempUsername.trim()) {
+      this.username = this.tempUsername.trim();
+      this.changeUserModal = false;
+    }
+  }
+
+  cancelChangeUsername() {
+    this.changeUserModal = false;
   }
 }
