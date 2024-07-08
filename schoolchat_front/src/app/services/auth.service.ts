@@ -25,13 +25,18 @@ export class AuthService {
   }
 
   completeRegistration(userId: string, username: string, realName: string, password: string) {
-    return this.http.post(`${this.apiUrl}/complete-registration`, { userId, username, realName, password });
+    return this.http.post(`${this.apiUrl}/complete-registration`, { userId, username, realName, password }).
+      pipe(tap((res: any) => {
+        localStorage.setItem('token', res.token);
+        this.router.navigate(['chat']);
+      }));
   }
 
   login(email: string, password: string) {
     return this.http.post(`${this.apiUrl}/login`, { email, password }).pipe(
       tap((res: any) => {
         localStorage.setItem('token', res.token);
+        this.router.navigate(['chat']);
       }
     ));
   }

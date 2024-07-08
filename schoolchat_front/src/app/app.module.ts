@@ -22,7 +22,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';	
+import { MatCard, MatCardModule } from '@angular/material/card';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';	
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -51,6 +52,8 @@ export function tokenGetter() {
     MatFormFieldModule,
     MatButtonModule,
     MatIconModule,
+    MatInputModule,
+    MatCardModule,
     HttpClientModule,
     MatCardModule,
     JwtModule.forRoot({
@@ -65,7 +68,7 @@ export function tokenGetter() {
     PrimengModule,
     JoinServerComponent
   ],
-  providers: [JwtHelperService],
+  providers: [JwtHelperService, provideAnimationsAsync()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

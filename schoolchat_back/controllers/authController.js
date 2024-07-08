@@ -40,8 +40,8 @@ const completeRegistration = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 8);
 
   try {
-    const result = await User.update(userId, { username, realName, password: hashedPassword, complete: true });
-    res.status(200).send({ message: 'Registro completado.', user: result.Attributes });
+    const token = jwt.sign({ userId: user.userId }, jwtSecret, { expiresIn: '1h' });
+    res.status(200).send({ message: 'Registro completado.', token });
   } catch (error) {
     res.status(500).send({ error: 'Error al completar el registro. Razon: ' + error});
   }
