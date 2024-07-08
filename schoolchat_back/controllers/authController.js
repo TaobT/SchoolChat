@@ -9,6 +9,8 @@ const register = async (req, res) => {
   const userId = uuidv4();
   const registrationTime = new Date().toISOString();
 
+  const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '2d' }); // TODO: Notificar al usuario si su token expiro
+
   try {
     await User.create({
       userId,
@@ -17,19 +19,29 @@ const register = async (req, res) => {
       registrationTime,
       complete: false
     });
-    res.status(201).send({ userId, message: 'Registro inicial completado. Por favor, continúa con la registración.' });
-  } catch (error) {
-    res.status(500).send({ error: 'Error al registrar el usuario.' });
+    res.status(201).send({ message: 'Usuario creado.', token });
+  } catch (err) {
+    res.status(500).send({ err});
   }
 };
+
+const verifyToken = async (req, res) => {
+  const { token } = req.body;
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    res.status(200).send({ userId: decoded.userId });
+  } catch (error) {
+    res.status(401).send({ error: 'Token invalido.' });
+  }
+}
 
 const completeRegistration = async (req, res) => {
   const { userId, username, realName, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 8);
 
   try {
-    const result = await User.update(userId, { username, realName, password: hashedPassword, complete: true });
-    res.status(200).send({ message: 'Registro completado.', user: result.Attributes });
+    const token = jwt.sign({ userId: user.userId }, jwtSecret, { expiresIn: '1h' });
+    res.status(200).send({ message: 'Registro completado.', token });
   } catch (error) {
     res.status(500).send({ error: 'Error al completar el registro. Razon: ' + error});
   }
@@ -60,5 +72,6 @@ const login = async (req, res) => {
 module.exports = {
   register,
   completeRegistration,
+  verifyToken,
   login
 };
