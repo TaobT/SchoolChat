@@ -1,23 +1,44 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.css'
+  styleUrls: ['./chat.component.css']
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit {
   @ViewChild('messageContainer') messageContainer!: ElementRef;
   messages: { user: string, avatar: string, text: string, time: string }[] = [
-    { user: 'Alice', avatar: 'https://via.placeholder.com/40', text: 'Hello!', time: '10:00 AM' },
-    { user: 'Bob', avatar: 'https://via.placeholder.com/40', text: 'Hi there!', time: '10:01 AM' }
+    { user: 'Oscar', avatar: 'https://via.placeholder.com/40', text: 'Hello!', time: '10:00 AM' },
+    { user: 'Omar', avatar: 'https://via.placeholder.com/40', text: 'Hi there!', time: '10:01 AM' }
   ];
   newMessage: string = '';
+  username: string | null = null;
+  avatar: string = '';
+  tempUsername: string = '';
+  showUsernameModal: boolean = true;
+  changeUserModal: boolean = false;
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit() {
+    this.userService.getUser().subscribe(
+      user => {
+        this.username = user.username;
+        this.showUsernameModal = false; // Asumiendo que ya está autenticado
+      },
+      error => {
+        console.error('Error fetching user data', error);
+        this.showUsernameModal = true; // Mostrar el modal si no se pudo obtener el usuario
+      }
+    );
+  }
 
   sendMessage() {
-    if (this.newMessage.trim()) {
+    if (this.newMessage.trim() && this.username) {
       this.messages.push({
-        user: 'You',
-        avatar: 'https://via.placeholder.com/40',
+        user: this.username,
+        avatar: this.avatar,
         text: this.newMessage,
         time: new Date().toLocaleTimeString()
       });

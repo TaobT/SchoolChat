@@ -70,9 +70,48 @@ const login = async (req, res) => {
   }
 };
 
+const getUserInfo = async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    console.error('Token no proporcionado.');
+    return res.status(401).send({ error: 'Token no proporcionado.' });
+  }
+
+  const token = authHeader.split(' ')[1]; // Suponiendo que el token viene en el formato "Bearer <token>"
+  if (!token) {
+    console.error('Token no proporcionado después de dividir el encabezado.');
+    return res.status(401).send({ error: 'Token no proporcionado.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    const userId = decoded.userId;
+    console.log('Token decodificado:', decoded);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      console.error('Usuario no encontrado para el ID:', userId);
+      return res.status(404).send({ error: 'Usuario no encontrado.' });
+    }
+
+    console.log('Usuario encontrado:', user);
+    res.status(200).send({
+      userId: user.userId,
+      username: user.username,
+      realName: user.realName,
+      email: user.email
+    });
+  } catch (error) {
+    console.error('Error en getUserInfo:', error);
+    res.status(401).send({ error: 'Token inválido o expirado.' });
+  }
+};
+
+
 module.exports = {
   register,
   completeRegistration,
   verifyToken,
-  login
+  login,
+  getUserInfo
 };

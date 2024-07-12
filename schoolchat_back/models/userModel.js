@@ -1,15 +1,21 @@
 const { dynamoDB } = require('../config/config');
 
 const User = {
-  create: (user) => {
+  create: async (user) => {
     const params = {
       TableName: 'Users',
       Item: user
     };
-    return dynamoDB.put(params).promise();
+    try {
+      await dynamoDB.put(params).promise();
+      console.log('Usuario creado:', user);
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
+      throw error;
+    }
   },
-  
-  update: (userId, updateValues) => {
+
+  update: async (userId, updateValues) => {
     const params = {
       TableName: 'Users',
       Key: { userId },
@@ -18,10 +24,31 @@ const User = {
       ExpressionAttributeValues: Object.keys(updateValues).reduce((acc, key) => ({ ...acc, [`:${key}`]: updateValues[key] }), {}),
       ReturnValues: 'UPDATED_NEW'
     };
-    return dynamoDB.update(params).promise();
+    try {
+      const result = await dynamoDB.update(params).promise();
+      console.log('Usuario actualizado:', result);
+      return result;
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      throw error;
+    }
   },
-  
-  findByEmail: (email) => {
+
+  findById: async (userId) => {
+    const params = {
+      TableName: 'Users',
+      Key: { userId }
+    };
+    try {
+      const result = await dynamoDB.get(params).promise();
+      return result.Item;
+    } catch (error) {
+      console.error('Error al buscar usuario por ID:', error);
+      throw error;
+    }
+  },
+
+  findByEmail: async (email) => {
     const params = {
       TableName: 'Users',
       IndexName: 'EmailIndex',
@@ -30,10 +57,17 @@ const User = {
         ':e': email
       }
     };
-    return dynamoDB.query(params).promise();
+    try {
+      const result = await dynamoDB.query(params).promise();
+      console.log('Usuario encontrado por email:', result);
+      return result;
+    } catch (error) {
+      console.error('Error al buscar usuario por email:', error);
+      throw error;
+    }
   },
-  
-  deleteIncomplete: (twoDaysAgo) => {
+
+  deleteIncomplete: async (twoDaysAgo) => {
     const params = {
       TableName: 'Users',
       FilterExpression: 'complete = :c and registrationTime < :time',
@@ -42,15 +76,28 @@ const User = {
         ':time': twoDaysAgo
       }
     };
-    return dynamoDB.scan(params).promise();
+    try {
+      const result = await dynamoDB.scan(params).promise();
+      console.log('Usuarios incompletos encontrados:', result);
+      return result;
+    } catch (error) {
+      console.error('Error al buscar usuarios incompletos:', error);
+      throw error;
+    }
   },
-  
-  deleteById: (userId) => {
+
+  deleteById: async (userId) => {
     const params = {
       TableName: 'Users',
       Key: { userId }
     };
-    return dynamoDB.delete(params).promise();
+    try {
+      await dynamoDB.delete(params).promise();
+      console.log('Usuario eliminado:', userId);
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      throw error;
+    }
   }
 };
 
