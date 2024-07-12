@@ -65,8 +65,8 @@ const login = async (req, res) => {
 
     const token = jwt.sign({ userId: user.userId }, jwtSecret, { expiresIn: '1h' });
     res.status(200).send({ token });
-  } catch (error) {
-    res.status(500).send({ error: 'Error al iniciar sesión.' });
+  } catch (err) {
+    res.status(500).send({ error: 'Error al iniciar sesión.', err  });
   }
 };
 
