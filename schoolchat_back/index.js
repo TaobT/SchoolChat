@@ -9,7 +9,7 @@ const app = express();
 
 app.use(cors());
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: 'https://localhost:4200',
     credentials: true  // Habilita el intercambio de cookies (si es necesario)
 }));
 app.use(bodyParser.json());
