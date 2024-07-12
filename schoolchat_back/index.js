@@ -7,11 +7,20 @@ const fs = require('fs');
 const https = require('https');
 const app = express();
 
-app.use(cors());
-app.use(cors({
-    origin: 'https://localhost:4200',
-    credentials: true  // Habilita el intercambio de cookies (si es necesario)
-}));
+const allowedOrigins = ['https://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com']; // Agrega los orígenes permitidos aquí
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Habilita el intercambio de cookies (si es necesario)
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
