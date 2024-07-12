@@ -48,4 +48,27 @@ export class ChatComponent implements OnInit {
       }, 0);
     }
   }
+
+  setUsername() {
+    if (this.tempUsername.trim()) {
+      this.username = this.tempUsername.trim();
+      this.showUsernameModal = false;
+    }
+  }
+
+  changeUsername() {
+    this.tempUsername = '';
+    this.changeUserModal = true;
+  }
+
+  confirmChangeUsername() {
+    if (this.tempUsername.trim()) {
+      this.username = this.tempUsername.trim();
+      this.changeUserModal = false;
+    }
+  }
+
+  cancelChangeUsername() {
+    this.changeUserModal = false;
+  }
 }
