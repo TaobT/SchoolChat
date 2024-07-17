@@ -1,3 +1,5 @@
+const express = require('express');
+const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 require('dotenv').config();
 const cors = require('cors');
@@ -24,15 +26,6 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
-
-// Read SSL certificate files
-const privateKey = fs.readFileSync('./https/nginx.key', 'utf8');
-const certificate = fs.readFileSync('./https/nginx.crt', 'utf8');
-
-const credentials = {
-  key: privateKey,
-  cert: certificate
-};
 
 // Create HTTPS server
 try {
