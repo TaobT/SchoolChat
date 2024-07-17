@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'join-server', component: JoinServerComponent },
   { path: 'home', component: HomeComponent },
-  //{ path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
   //{ path: '**', redirectTo: '/home' },
   { path: 'chat', component: ChatComponent }
 ];
