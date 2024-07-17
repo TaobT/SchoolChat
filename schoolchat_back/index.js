@@ -38,13 +38,15 @@ try {
     cert: certificate
   };
   var httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(PORT, () => {
+    console.log(`HTTPS Server is running on port ${PORT}`);
+  });
 }
 catch (e) {
   
   console.log('\x1b[33m%s\x1b[0m', 'No se pudo crear un servidor HTTPS, se usará HTTP');
-  var httpsServer = https.createServer(app);
+  var httpServer = https.createServer(app);
+  httpServer.listen(PORT, () => {
+    console.log(`HTTP Server is running on port ${PORT}`);
+  });
 }
-
-httpsServer.listen(PORT, () => {
-  console.log(`HTTPS Server is running on port ${PORT}`);
-});
