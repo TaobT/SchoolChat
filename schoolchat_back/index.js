@@ -1,13 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const groupRoutes = require('./routes/groupRoutes');
 require('dotenv').config();
 const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
 const app = express();
 
-const allowedOrigins = ['https://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com']; // Agrega los orígenes permitidos aquí
+const allowedOrigins = ['https://localhost:4200', 'http://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com']; // Agrega los orígenes permitidos aquí
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -24,6 +26,8 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/groups', groupRoutes);
 
 const PORT = process.env.PORT || 3000;
 
@@ -45,8 +49,7 @@ try {
 catch (e) {
   
   console.log('\x1b[33m%s\x1b[0m', 'No se pudo crear un servidor HTTPS, se usará HTTP');
-  var httpServer = https.createServer(app);
-  httpServer.listen(PORT, () => {
-    console.log(`HTTP Server is running on port ${PORT}`);
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 }

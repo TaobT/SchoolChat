@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { JoinServerComponent } from './join-server.component';
+import { JoinCreateGroupComponent } from './join-create-group.component';
 
-describe('JoinServerComponent', () => {
-  let component: JoinServerComponent;
-  let fixture: ComponentFixture<JoinServerComponent>;
+describe('JoinCreateGroupComponent', () => {
+  let component: JoinCreateGroupComponent;
+  let fixture: ComponentFixture<JoinCreateGroupComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [JoinServerComponent]
+      declarations: [JoinCreateGroupComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(JoinServerComponent);
+    fixture = TestBed.createComponent(JoinCreateGroupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
