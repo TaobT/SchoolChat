@@ -34,6 +34,14 @@ export class GroupService {
     });
   }
 
+  getGroupsByUserId() {
+    return this.http.get(`${this.apiUrl}/user/groups`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+  }
+
   getGroupByInviteCode(inviteCode: string) {
     return this.http.get(`${this.apiUrl}/invite/${inviteCode}`, {
       headers: {

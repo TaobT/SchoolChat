@@ -62,6 +62,31 @@ exports.getGroup = async (req, res) => {
   }
 };
 
+exports.getGroupsByUserId = async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const groups = await Group.findByUserId(userId);
+    res.status(200).json(groups);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener grupos', error });
+  }
+};
+
+exports.getGroupByInviteCode = async (req, res) => {
+  const { inviteCode } = req.params;
+
+  try {
+    const groups = await Group.findByInviteCode(inviteCode);
+    if (groups.length === 0) {
+      return res.status(404).json({ message: 'Grupo no encontrado' });
+    }
+    res.status(200).json(groups[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener grupo', error });
+  }
+}
+
 exports.listAllGroups = async (req, res) => {
   try {
     const groups = await Group.listAll();
@@ -70,3 +95,27 @@ exports.listAllGroups = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener grupos', error });
   }
 }
+
+exports.updateGroup = async (req, res) => {
+  const { groupId } = req.params;
+  const updateValues = req.body;
+
+  try {
+    const group = await Group.update(groupId, updateValues);
+    res.status(200).json({ message: 'Grupo actualizado', group });
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Error al actualizar grupo', error });
+  }
+}
+
+exports.deleteGroup = async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    await Group.deleteById(groupId);
+    res.status(200).json({ message: 'Grupo eliminado' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar grupo', error });
+  }
+};

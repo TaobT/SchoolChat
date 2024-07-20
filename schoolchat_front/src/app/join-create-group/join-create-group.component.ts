@@ -41,10 +41,11 @@ export class JoinCreateGroupComponent {
       this.groupService.createGroup(this.createGroupForm.value).subscribe(
         response => {
           console.log('Grupo creado:', response);
-          this.dialogRef.close();
+          this.dialogRef.close({success: true});
         },
         error => {
           console.error('Error al crear grupo:', error);
+          this.dialogRef.close({success: false});
         }
       );
     }

@@ -3,7 +3,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    background-color: #36393f;
   }
   
   body {
@@ -48,12 +47,6 @@
     margin-top: auto; /* Mueve el botón al fondo de la barra lateral */
     width: 80%;
     text-align: center;
-  }
-  
-  /* Estilos del contenido principal */
-  .main-content {
-    padding: 0%;
-    margin-left: 3%; /* Alinea el contenido principal a la derecha de la barra lateral */
   }
   
   .main-content h1 {

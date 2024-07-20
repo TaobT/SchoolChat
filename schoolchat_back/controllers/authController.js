@@ -86,7 +86,7 @@ const getUserInfo = async (req, res) => {
   try {
     const decoded = jwt.verify(token, jwtSecret);
     const userId = decoded.userId;
-    console.log('Token decodificado:', decoded);
+    // console.log('Token decodificado:', decoded);
 
     const user = await User.findById(userId);
     if (!user) {
@@ -94,7 +94,7 @@ const getUserInfo = async (req, res) => {
       return res.status(404).send({ error: 'Usuario no encontrado.' });
     }
 
-    console.log('Usuario encontrado:', user);
+    // console.log('Usuario encontrado:', user);
     res.status(200).send({
       userId: user.userId,
       username: user.username,

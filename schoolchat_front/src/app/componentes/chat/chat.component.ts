@@ -1,6 +1,10 @@
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { MessageService } from '../../services/message.service';
+import { GroupService } from '../../services/group.service';
+import { JoinCreateGroupComponent } from '../../join-create-group/join-create-group.component';
+import { MatDialog } from '@angular/material/dialog';
+import { Group } from '../../models/group.model';
 
 @Component({
   selector: 'app-chat',
@@ -18,18 +22,65 @@ export class ChatComponent implements OnInit {
   changeUserModal: boolean = false;
   channelId: string = 'defaultChannel'; // Definir el canal actual
 
-  constructor(private userService: UserService, private messageService: MessageService) { }
+  groups: Group[] = [];
+
+  constructor(private userService: UserService, private messageService: MessageService,
+    public dialog: MatDialog, private groupService: GroupService
+  ) { }
 
   ngOnInit() {
+    this.showUsernameModal = false;
+    this.username = 'Usuario';
+    this.loadGroups(false);
+
+
+    // this.userService.getUser().subscribe(
+    //   user => {
+    //     this.username = user.username;
+    //     this.showUsernameModal = false; // Asumiendo que ya está autenticado
+    //     this.loadMessages();
+    //   },
+    //   error => {
+    //     console.error('Error fetching user data', error);
+    //     this.showUsernameModal = true; // Mostrar el modal si no se pudo obtener el usuario
+    //   }
+    // );
+
+  }
+
+  loadGroups(loadUser: boolean) {
+    this.groupService.getGroupsByUserId().subscribe(
+      {
+        next: (response: any) => {
+          this.groups = response;
+          if (this.groups.length === 0) {
+            this.openDialog();
+          } else {
+            this.channelId = this.groups[0].groupId;
+
+            //Ahora traer la información del usuario
+            if(loadUser) this.loadUserInfo();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error al obtener grupos:', error);
+        }
+      }
+    );
+  }
+
+  loadUserInfo() {
     this.userService.getUser().subscribe(
       user => {
         this.username = user.username;
+        // this.avatar = user.avatar;
         this.showUsernameModal = false; // Asumiendo que ya está autenticado
         this.loadMessages();
       },
       error => {
         console.error('Error fetching user data', error);
         this.showUsernameModal = true; // Mostrar el modal si no se pudo obtener el usuario
+        this.username = '';
       }
     );
   }
@@ -105,5 +156,23 @@ export class ChatComponent implements OnInit {
 
   cancelChangeUsername() {
     this.changeUserModal = false;
+  }
+
+  openDialog() {
+    const dialogRef = this.dialog.open(JoinCreateGroupComponent, {
+      width: '400px',
+      height: 'auto'
+    });
+    
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      this.loadGroups(false);
+    });
+  }
+
+  changeChannel(channelId: string) {
+    console.log('Cambiando a canal:', channelId);
+    this.channelId = channelId;
+    this.loadMessages();
   }
 }

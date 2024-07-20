@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { JoinCreateGroupComponent } from '../../join-create-group/join-create-group.component';
 
+import { GroupService } from '../../services/group.service';
+import { Group } from '../../models/group.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -9,17 +10,12 @@ import { JoinCreateGroupComponent } from '../../join-create-group/join-create-gr
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
-  constructor(public dialog: MatDialog) {}
-  servers = [1, 2, 3, 4, 5]; // Ejemplo de datos de servidores (pueden ser dinámicos)
+  constructor(public dialog: MatDialog, private groupService: GroupService) {}
+  groups: Group[] = [];
 
-  openDialog() {
-    const dialogRef = this.dialog.open(JoinCreateGroupComponent, {
-      width: '400px',
-      height: 'auto'
-    });
+  ngOnInit() {
     
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    });
   }
+
+  
 }

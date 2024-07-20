@@ -3,8 +3,8 @@ const router = express.Router();
 const messageController = require('../controllers/messageController')
 
 // Rutas de mensajes
-router.post('/messages', messageController.createMessage);
-router.get('/messages/channel/:channelId', messageController.getMessagesByChannel);
-router.get('/messages/user/:userId', messageController.getMessagesByUser);
+router.post('', messageController.createMessage);
+router.get('/channel/:channelId', messageController.getMessagesByChannel);
+router.get('/user/:userId', messageController.getMessagesByUser);
 
 module.exports = router;

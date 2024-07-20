@@ -91,6 +91,33 @@ const Group = {
       console.error('Error al listar grupos:', error);
       throw error;
     }
+  },
+
+  findByUserId: async (userId) => {
+    const params = {
+      TableName: 'Groups',
+      FilterExpression: 'contains(members, :userId)',
+      ExpressionAttributeValues: {
+        ':userId': userId
+      }
+    };
+    try {
+      const result = await dynamoDB.scan(params).promise();
+      // Extraer groupId de cada grupo encontrado
+      const groupsWithIds = result.Items.map(group => ({
+        groupId: group.groupId,
+        name: group.name, // puedes incluir otros atributos si lo deseas
+        photoUrl: group.photoUrl,
+        inviteCode: group.inviteCode,
+        createdBy: group.createdBy,
+        members: group.members
+      }));
+
+      return groupsWithIds;
+    } catch (error) {
+      console.error('Error al buscar grupos por ID de usuario:', error);
+      throw error;
+    }
   }
 };
 
