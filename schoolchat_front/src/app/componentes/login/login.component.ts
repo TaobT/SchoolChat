@@ -23,7 +23,7 @@ export class LoginComponent {
       const { email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe((response: any) => {
         localStorage.setItem('token', response.token);
-        this.router.navigate(['dashboard']); // Suponiendo que tienes un componente de dashboard
+        this.router.navigate(['chat']); // Suponiendo que tienes un componente de dashboard
       });
     }
   }

@@ -9,7 +9,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SidebarComponent } from './componentes/sidebar/sidebar.component';
 //Componentes
-import { JoinServerComponent } from './componentes/join-server/join-server.component';
 import { LoginComponent } from './componentes/login/login.component';
 import { RegisterComponent } from './componentes/register/register.component';
 import { HomeComponent } from './componentes/home/home.component';
@@ -26,6 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCard, MatCardModule } from '@angular/material/card';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ChatComponent } from './componentes/chat/chat.component';
+import { JoinCreateGroupComponent } from './join-create-group/join-create-group.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -35,13 +36,13 @@ export function tokenGetter() {
   declarations: [
     AppComponent,
     SidebarComponent,
-    JoinServerComponent,
     ChatComponent,
     LoginComponent,
     RegisterComponent,
     HomeComponent,
     CompleteRegistrationComponent,
     NavbarComponent,
+    JoinCreateGroupComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +59,7 @@ export function tokenGetter() {
     MatInputModule,
     MatCardModule,
     HttpClientModule,
+    MatDialogModule,
     MatCardModule,
     JwtModule.forRoot({
       config: {
@@ -68,8 +70,7 @@ export function tokenGetter() {
     })
   ],
   exports: [
-    PrimengModule,
-    JoinServerComponent
+    PrimengModule
   ],
   providers: [JwtHelperService, provideAnimationsAsync()],
   bootstrap: [AppComponent]

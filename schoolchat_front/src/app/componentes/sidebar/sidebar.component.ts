@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+
+import { GroupService } from '../../services/group.service';
+import { Group } from '../../models/group.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -6,5 +10,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
-  servers = [1, 2, 3, 4, 5]; // Ejemplo de datos de servidores (pueden ser dinámicos)
+  constructor(public dialog: MatDialog, private groupService: GroupService) {}
+  groups: Group[] = [];
+
+  ngOnInit() {
+    
+  }
+
+  
 }
