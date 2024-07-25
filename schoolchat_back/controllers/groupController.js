@@ -1,7 +1,7 @@
-// controllers/groupController.js
 const { v4: uuidv4 } = require('uuid');
 const Group = require('../models/groupModel');
 const User = require('../models/userModel');
+const Channel = require('../models/channelModel');
 
 exports.createGroup = async (req, res) => {
   const { name, photoUrl } = req.body;
@@ -17,11 +17,23 @@ exports.createGroup = async (req, res) => {
     members: [userId]
   };
 
+  const channel = {
+    channelId: uuidv4(),
+    groupId: group.groupId,
+    name: 'General', 
+    description: 'Canal por defecto para el grupo'
+  };
+
   try {
+    // Crear el grupo
     await Group.create(group);
-    res.status(201).json({ message: 'Grupo creado', group });
+
+    // Crear el canal por defecto
+    await Channel.create(channel);
+
+    res.status(201).json({ message: 'Grupo y canal por defecto creados', group, channel });
   } catch (error) {
-    res.status(500).json({ message: 'Error al crear grupo', error });
+    res.status(500).json({ message: 'Error al crear grupo y canal', error });
   }
 };
 
@@ -85,7 +97,7 @@ exports.getGroupByInviteCode = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener grupo', error });
   }
-}
+};
 
 exports.listAllGroups = async (req, res) => {
   try {
@@ -94,7 +106,7 @@ exports.listAllGroups = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener grupos', error });
   }
-}
+};
 
 exports.updateGroup = async (req, res) => {
   const { groupId } = req.params;
@@ -103,11 +115,10 @@ exports.updateGroup = async (req, res) => {
   try {
     const group = await Group.update(groupId, updateValues);
     res.status(200).json({ message: 'Grupo actualizado', group });
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ message: 'Error al actualizar grupo', error });
   }
-}
+};
 
 exports.deleteGroup = async (req, res) => {
   const { groupId } = req.params;

@@ -27,6 +27,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { ChatComponent } from './componentes/chat/chat.component';
 import { JoinCreateGroupComponent } from './join-create-group/join-create-group.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { JoinCreateChannelComponent } from './join-create-channel/join-create-channel.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -43,6 +44,7 @@ export function tokenGetter() {
     CompleteRegistrationComponent,
     NavbarComponent,
     JoinCreateGroupComponent,
+    JoinCreateChannelComponent,
   ],
   imports: [
     BrowserModule,

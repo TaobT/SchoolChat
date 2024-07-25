@@ -1,15 +1,28 @@
+<!-- Contenedor principal de chat -->
 <div class="sidebar">
   <ul>
     <li *ngFor="let group of groups">
-      <img src="{{group.photoUrl}}" alt="Server" (click)="changeChannel(group.groupId)">
+      <img src="{{group.photoUrl}}" alt="Group" (click)="changeGroup(group.groupId)">
     </li>
   </ul>
-  <button pButton type="button" icon="pi pi-plus" (click)="openDialog()"></button>
+  <button pButton type="button" icon="pi pi-plus" (click)="openGroupDialog()"></button>
 </div>
+
+<!-- Selector de canales -->
+<div class="channel-selector" *ngIf="groupId">
+  <ul>
+    <li *ngFor="let channel of channels" (click)="changeChannel(channel.channelId)">
+      {{ channel.name }}
+    </li>
+  </ul>
+  <button pButton type="button" icon="pi pi-plus" (click)="openChannelDialog()"></button>
+</div>
+
+<!-- Contenedor de chat -->
 <div class="chat-container" *ngIf="username">
   <div class="chat-header">
     <h2>Chat Room</h2>
-    <button class="change-user-button" (click)="changeUsername()">Change User</button>
+    <!--<button class="change-user-button" (click)="changeUsername()">Change User</button>-->
   </div>
   <div class="chat-messages" #messageContainer>
     <div class="message" *ngFor="let message of messages">
@@ -29,7 +42,7 @@
   </div>
 </div>
 
-<!-- Modal para ingresar el nombre al iniciar -->
+<!-- Modal para ingresar nombre de usuario -->
 <div class="username-modal" *ngIf="showUsernameModal">
   <div class="modal-content">
     <h2>Enter your name</h2>
@@ -38,12 +51,49 @@
   </div>
 </div>
 
-<!-- Modal para cambiar de usuario -->
+<!-- Modal para cambiar nombre de usuario -->
 <div class="change-user-modal" *ngIf="changeUserModal">
   <div class="modal-content">
     <h2>Enter your name</h2>
     <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="confirmChangeUsername()">
     <button (click)="confirmChangeUsername()">Join Chat</button>
     <button (click)="cancelChangeUsername()">Cancel</button>
+  </div>
+</div>
+
+<!-- Modal para crear o unirse a un canal -->
+<div class="channel-modal" *ngIf="showChannelModal">
+  <div class="modal-content">
+    <h2>{{ isCreatingChannel ? 'Create Channel' : 'Join Channel' }}</h2>
+    <button mat-button (click)="switchChannelMode()">
+      {{ isCreatingChannel ? 'Join Channel' : 'Create Channel' }}
+    </button>
+
+    <div *ngIf="isCreatingChannel">
+      <form [formGroup]="createChannelForm" (ngSubmit)="createChannel()">
+        <mat-form-field appearance="fill">
+          <mat-label>Channel Name</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit" [disabled]="createChannelForm.invalid">Create Channel</button>
+      </form>
+    </div>
+
+    <div *ngIf="!isCreatingChannel">
+      <form [formGroup]="joinChannelForm" (ngSubmit)="joinChannel()">
+        <mat-form-field appearance="fill">
+          <mat-label>Invite Code</mat-label>
+          <input matInput formControlName="inviteCode" (input)="checkInviteCode()">
+        </mat-form-field>
+        <div *ngIf="channelDetails">
+          <h3>Channel Details:</h3>
+          <p>Name: {{ channelDetails.name }}</p>
+        </div>
+        <div *ngIf="channelNotFound">
+          <p>Channel not found</p>
+        </div>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!channelDetails">Join Channel</button>
+      </form>
+    </div>
   </div>
 </div>

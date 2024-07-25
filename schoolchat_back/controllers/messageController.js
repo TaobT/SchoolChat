@@ -2,12 +2,18 @@ const Message = require('../models/messageModel');
 const { v4: uuidv4 } = require('uuid');
 
 const createMessage = async (req, res) => {
-  const { channelId, userId, username, avatar, text } = req.body;
+  const { groupId, channelId, userId, username, avatar, text } = req.body;
   const timestamp = new Date().toISOString();
   const messageId = uuidv4();
 
+  // Verifica que channelId no esté vacío
+  if (!channelId || channelId.trim() === '') {
+    return res.status(400).send({ error: 'El channelId no puede estar vacío' });
+  }
+
   const message = {
     messageId,
+    groupId,
     channelId,
     userId,
     username,

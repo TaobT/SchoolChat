@@ -110,7 +110,8 @@ const Group = {
         photoUrl: group.photoUrl,
         inviteCode: group.inviteCode,
         createdBy: group.createdBy,
-        members: group.members
+        members: group.members,
+        channels: group.channels || [] // Agregar canales
       }));
 
       return groupsWithIds;

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 interface Message {
+  groupId: string;
   channelId: string;
   userId: string;
   username: string;
@@ -22,7 +23,7 @@ export class MessageService {
 
   getMessagesByChannel(channelId: string): Observable<Message[]> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}` // Asegúrate de que el token esté almacenado en localStorage
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     });
     return this.http.get<Message[]>(`${this.apiUrl}/channel/${channelId}`, { headers });
   }

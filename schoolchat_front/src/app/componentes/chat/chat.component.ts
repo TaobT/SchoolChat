@@ -5,6 +5,9 @@ import { GroupService } from '../../services/group.service';
 import { JoinCreateGroupComponent } from '../../join-create-group/join-create-group.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Group } from '../../models/group.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChannelService } from '../../services/channel.service';
+import { Channel } from '../../models/channel.model';
 
 @Component({
   selector: 'app-chat',
@@ -20,32 +23,40 @@ export class ChatComponent implements OnInit {
   tempUsername: string = '';
   showUsernameModal: boolean = true;
   changeUserModal: boolean = false;
-  channelId: string = 'defaultChannel'; // Definir el canal actual
+  showChannelModal: boolean = false;
+  isCreatingChannel: boolean = true;
+  groupId: string = ''; // ID del grupo actual
+  channelId: string = ''; // ID del canal actual
 
   groups: Group[] = [];
+  channels: Channel[] = [];
 
-  constructor(private userService: UserService, private messageService: MessageService,
-    public dialog: MatDialog, private groupService: GroupService
-  ) { }
+  createChannelForm: FormGroup;
+  joinChannelForm: FormGroup;
+  channelDetails: Channel | null = null;
+  channelNotFound: boolean = false;
+
+  constructor(
+    private userService: UserService,
+    private messageService: MessageService,
+    private channelService: ChannelService,
+    public dialog: MatDialog,
+    private groupService: GroupService,
+    private fb: FormBuilder
+  ) {
+    this.createChannelForm = this.fb.group({
+      name: ['', Validators.required]
+    });
+
+    this.joinChannelForm = this.fb.group({
+      inviteCode: ['', Validators.required]
+    });
+  }
 
   ngOnInit() {
     this.showUsernameModal = false;
     this.username = 'Usuario';
     this.loadGroups(false);
-
-
-    // this.userService.getUser().subscribe(
-    //   user => {
-    //     this.username = user.username;
-    //     this.showUsernameModal = false; // Asumiendo que ya está autenticado
-    //     this.loadMessages();
-    //   },
-    //   error => {
-    //     console.error('Error fetching user data', error);
-    //     this.showUsernameModal = true; // Mostrar el modal si no se pudo obtener el usuario
-    //   }
-    // );
-
   }
 
   loadGroups(loadUser: boolean) {
@@ -54,7 +65,7 @@ export class ChatComponent implements OnInit {
         next: (response: any) => {
           this.groups = response;
           if (this.groups.length === 0) {
-            this.openDialog();
+            this.openGroupDialog();
           } else {
             this.channelId = this.groups[0].groupId;
 
@@ -107,6 +118,7 @@ export class ChatComponent implements OnInit {
   sendMessage() {
     if (this.newMessage.trim() && this.username !== null) {
       const message = {
+        groupId: this.groupId,
         channelId: this.channelId,
         userId: 'currentUserId', // Reemplaza esto con la lógica para obtener el userId del usuario autenticado
         username: this.username,
@@ -158,7 +170,7 @@ export class ChatComponent implements OnInit {
     this.changeUserModal = false;
   }
 
-  openDialog() {
+  openGroupDialog() {
     const dialogRef = this.dialog.open(JoinCreateGroupComponent, {
       width: '400px',
       height: 'auto'
@@ -170,9 +182,79 @@ export class ChatComponent implements OnInit {
     });
   }
 
+  openChannelDialog() {
+    this.showChannelModal = true;
+  }
+
+  switchChannelMode() {
+    this.isCreatingChannel = !this.isCreatingChannel;
+    this.channelDetails = null;
+    this.channelNotFound = false;
+  }
+
+  createChannel() {
+    if (this.createChannelForm.valid) {
+      this.channelService.createChannel(this.createChannelForm.value).subscribe(
+        response => {
+          console.log('Channel created:', response);
+          this.showChannelModal = false;
+          this.loadChannels();
+        },
+        error => {
+          console.error('Error creating channel:', error);
+        }
+      );
+    }
+  }
+
+  checkInviteCode() {
+    if (this.joinChannelForm.controls['inviteCode'].valid) {
+      const inviteCode = this.joinChannelForm.controls['inviteCode'].value;
+      this.channelService.getChannelByInviteCode(inviteCode).subscribe(
+        response => {
+          this.channelDetails = response;
+          this.channelNotFound = false;
+        },
+        error => {
+          this.channelDetails = null;
+          this.channelNotFound = true;
+        }
+      );
+    }
+  }
+
+  joinChannel() {
+    if (this.channelDetails && this.joinChannelForm.valid) {
+      this.channelService.joinChannel({ channelId: this.channelDetails.channelId }).subscribe(
+        response => {
+          console.log('Joined channel:', response);
+          this.showChannelModal = false;
+          this.loadChannels();
+        },
+        error => {
+          console.error('Error joining channel:', error);
+        }
+      );
+    }
+  }
+
+  changeGroup(groupId: string) {
+    this.groupId = groupId;
+    this.loadChannels();
+  }
+
+  loadChannels() {
+    if (this.groupId) {
+      this.channelService.getChannelsByGroupId(this.groupId).subscribe(channels => {
+        this.channels = channels;
+      });
+    }
+  }
+
   changeChannel(channelId: string) {
     console.log('Cambiando a canal:', channelId);
     this.channelId = channelId;
     this.loadMessages();
   }
+
 }
