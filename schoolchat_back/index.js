@@ -37,11 +37,12 @@ try {
   const privateKey = fs.readFileSync('./https/nginx.key', 'utf8');
   const certificate = fs.readFileSync('./https/nginx.crt', 'utf8');
   
-  const credentials = {
+  const options = {
     key: privateKey,
-    cert: certificate
+    cert: certificate,
+    secureOptions: require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_TLSv1_1
   };
-  var httpsServer = https.createServer(credentials, app);
+  var httpsServer = https.createServer(options, app);
   httpsServer.listen(PORT, () => {
     console.log(`HTTPS Server is running on port ${PORT}`);
   });
