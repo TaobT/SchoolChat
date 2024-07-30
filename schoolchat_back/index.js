@@ -34,8 +34,8 @@ const PORT = process.env.PORT || 3000;
 // Create HTTPS server
 try {
   // Read SSL certificate files
-  const privateKey = fs.readFileSync('./https/nginx.key', 'utf8');
-  const certificate = fs.readFileSync('./https/nginx.crt', 'utf8');
+  const privateKey = fs.readFileSync('/etc/nginx/ssl/nginx.key', 'utf8');
+  const certificate = fs.readFileSync('/etc/nginx/ssl/nginx.crt', 'utf8');
   
   const options = {
     key: privateKey,
