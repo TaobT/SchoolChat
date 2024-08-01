@@ -3,12 +3,17 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const channelRoutes = require('./routes/channelsRoutes');
 require('dotenv').config();
 const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const app = express();
+const WebSocket = require('ws');
+const { setWss } = require('./middlewares/websocket')
 
+let wss;
 const allowedOrigins = ['https://localhost:4200', 'http://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com']; // Agrega los orígenes permitidos aquí
 
 const corsOptions = {
@@ -28,6 +33,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/channels', channelRoutes)
 
 const PORT = process.env.PORT || 3000;
 
@@ -43,14 +49,41 @@ try {
     secureOptions: require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_TLSv1_1
   };
   var httpsServer = https.createServer(options, app);
+  wss = new WebSocket.Server({ server: httpsServer });
+    wss.on('connection', function connection(ws) {
+      console.log('Client connected');
+
+      ws.on('close', function close() {
+        console.log('Client disconnected');
+      });
+    });
+  
   httpsServer.listen(PORT, () => {
     console.log(`HTTPS Server is running on port ${PORT}`);
   });
+
+  setWss(wss);
 }
 catch (e) {
   
   console.log('\x1b[33m%s\x1b[0m', 'No se pudo crear un servidor HTTPS, se usará HTTP');
-  app.listen(PORT, () => {
+  
+  const httpServer = http.createServer(app);
+
+  wss = new WebSocket.Server({ server: httpServer });
+  wss.on('connection', function connection(ws) {
+    console.log('Client connected');
+
+    ws.on('close', function close() {
+      console.log('Client disconnected');
+    });
+  });
+
+  httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
+
+  setWss(wss);
+
 }
+

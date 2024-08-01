@@ -12,6 +12,11 @@ const register = async (req, res) => {
   const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '2d' }); // TODO: Notificar al usuario si su token expiro
 
   try {
+    const existingUser = await User.findByEmail(email);
+    if (existingUser.Items.length > 0) {
+      return res.status(400).send({ error: 'El usuario ya existe.' });
+    }
+
     await User.create({
       userId,
       email,
@@ -36,11 +41,11 @@ const verifyToken = async (req, res) => {
 }
 
 const completeRegistration = async (req, res) => {
-  const { userId, username, realName, password } = req.body;
+  const { userId, username, realName, avatar, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 8);
 
   try {
-    await User.update(userId, { username, realName, password: hashedPassword, complete: true });
+    await User.update(userId, { username, realName, avatar, password: hashedPassword, complete: true });
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '1h' });
     res.status(200).send({ message: 'Registro completado.', token });
   } catch (error) {
@@ -99,6 +104,7 @@ const getUserInfo = async (req, res) => {
       userId: user.userId,
       username: user.username,
       realName: user.realName,
+      avatar: user.avatar,
       email: user.email
     });
   } catch (error) {
@@ -107,11 +113,34 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+const getUserInfoById = async (req, res) => {
+  const { idUser } = req.params;
+
+  try {
+    const user = await User.findById(idUser);
+    if (!user) {
+      return res.status(404).send({ error: 'Usuario no encontrado.' });
+    }
+    
+    res.status(200).send({
+      userId: user.userId,
+      username: user.username,
+      realName: user.realName,
+      avatar: user.avatar,
+      email: user.email
+    });
+  }
+  catch (error) {
+    res.status(500).send({ error: 'Error al obtener información del usuario. Razon: ' + error });
+  }
+}
+
 
 module.exports = {
   register,
   completeRegistration,
   verifyToken,
   login,
-  getUserInfo
+  getUserInfo,
+  getUserInfoById
 };

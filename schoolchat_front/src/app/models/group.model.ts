@@ -4,5 +4,6 @@ export interface Group {
     name: string;
     photoUrl: string;
     members: string[];
+    admins: string[];
     createdBy: string;
 }

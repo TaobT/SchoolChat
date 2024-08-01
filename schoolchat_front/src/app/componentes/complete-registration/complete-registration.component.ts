@@ -18,6 +18,7 @@ export class CompleteRegistrationComponent {
     this.completeRegistrationForm = this.fb.group({
       username: ['', Validators.required],
       realName: ['', Validators.required],
+      avatar: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8), Validators.pattern('(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}')]],
       confirmPassword: ['', Validators.required]
     }, { validators: PasswordMatchValidator }
@@ -41,8 +42,8 @@ export class CompleteRegistrationComponent {
 
   completeRegistration() {
     if (this.completeRegistrationForm.valid) {
-      const { username, realName, password } = this.completeRegistrationForm.value;
-      this.authService.completeRegistration(this.userId, username, realName, password).subscribe(response => {
+      const { username, realName, avatar, password } = this.completeRegistrationForm.value;
+      this.authService.completeRegistration(this.userId, username, realName, avatar, password).subscribe(response => {
         console.log('Registro completado');
       });
     }
