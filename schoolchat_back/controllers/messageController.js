@@ -1,5 +1,7 @@
 const Message = require('../models/messageModel');
 const { v4: uuidv4 } = require('uuid');
+const { getWss } = require('../middlewares/websocket');
+const WebSocket = require('ws');
 
 const createMessage = async (req, res) => {
   const { groupId, channelId, userId, username, avatar, text } = req.body;
@@ -24,6 +26,15 @@ const createMessage = async (req, res) => {
 
   try {
     await Message.create(message);
+
+    const wss = getWss();
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+      const modifiedMessage = { ...message, type: 'message' };
+      client.send(JSON.stringify(modifiedMessage));
+      }
+    });
+
     res.status(201).send({ message: 'Mensaje creado.', message });
   } catch (error) {
     res.status(500).send({ error: 'Error al crear el mensaje. Razón: ' + error });

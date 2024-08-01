@@ -111,12 +111,28 @@ const Group = {
         inviteCode: group.inviteCode,
         createdBy: group.createdBy,
         members: group.members,
-        channels: group.channels || [] // Agregar canales
+        channels: group.channels || [], // Agregar canales
+        admins: group.admins || [] // Agregar administradores
       }));
 
       return groupsWithIds;
     } catch (error) {
       console.error('Error al buscar grupos por ID de usuario:', error);
+      throw error;
+    }
+  },
+
+  usersInGroup: async (groupId) => {
+    const params = {
+      TableName: 'Groups',
+      Key: { groupId },
+      ProjectionExpression: 'members'
+    };
+    try {
+      const result = await dynamoDB.get(params).promise();
+      return result.Item.members;
+    } catch (error) {
+      console.error('Error al obtener usuarios en grupo:', error);
       throw error;
     }
   }

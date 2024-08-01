@@ -8,6 +8,10 @@ import { Group } from '../../models/group.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChannelService } from '../../services/channel.service';
 import { Channel } from '../../models/channel.model';
+import { environment } from '../../../environments/environment';
+import { JoinCreateChannelComponent } from '../../join-create-channel/join-create-channel.component';
+import { User } from '../../models/user.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-chat',
@@ -19,6 +23,8 @@ export class ChatComponent implements OnInit {
   messages: { user: string, avatar: string, text: string, time: string }[] = [];
   newMessage: string = '';
   username: string | null = null;
+  currentUserId: string = '';
+  isAdmin: boolean = false;
   avatar: string = '';
   tempUsername: string = '';
   showUsernameModal: boolean = true;
@@ -27,9 +33,14 @@ export class ChatComponent implements OnInit {
   isCreatingChannel: boolean = true;
   groupId: string = ''; // ID del grupo actual
   channelId: string = ''; // ID del canal actual
+  channelName: string = ''; // Nombre del canal actual
+  
+  //WebSocket
+  private socket: WebSocket | null = null;
 
   groups: Group[] = [];
   channels: Channel[] = [];
+  users: User[] = [];
 
   createChannelForm: FormGroup;
   joinChannelForm: FormGroup;
@@ -42,7 +53,8 @@ export class ChatComponent implements OnInit {
     private channelService: ChannelService,
     public dialog: MatDialog,
     private groupService: GroupService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar
   ) {
     this.createChannelForm = this.fb.group({
       name: ['', Validators.required]
@@ -55,11 +67,64 @@ export class ChatComponent implements OnInit {
 
   ngOnInit() {
     this.showUsernameModal = false;
-    this.username = 'Usuario';
-    this.loadGroups(false);
+    this.loadGroups();
+    this.connectToWebSocket();
   }
 
-  loadGroups(loadUser: boolean) {
+  connectToWebSocket() {
+    this.socket = new WebSocket(environment.wsUrl);
+
+    this.socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+
+      switch (message.type) {
+        case 'message':
+          this.handleMessage(message);
+          break;
+        case 'channel':
+          this.handleChannel(message);
+          break;
+        case 'user-joined':
+        case 'user-left':
+          this.handleUser(message);
+          break;
+        default:
+          console.log('Unknown message type:', message.type);
+      }
+
+      
+    }
+  }
+
+  handleMessage(message: any) {
+    if (message.channelId === this.channelId && message.userId !== this.currentUserId) {
+      this.messages.push({
+        user: message.username,
+        avatar: message.avatar,
+        text: message.text,
+        time: new Date(message.timestamp).toLocaleTimeString()
+      });
+      setTimeout(() => {
+        this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+      }, 0);
+    }
+  }
+
+  handleChannel(message: any) {
+    if (message.groupId === this.groupId && message.userId !== this.currentUserId) {
+      this.loadChannels();
+    }
+  }
+
+  handleUser(message: any) {
+    if(message.userId === this.currentUserId) return;
+    if (message.groupId === this.groupId ) {
+      this.loadUsersInGroup();
+    }
+    this.loadGroups();
+  }
+
+  loadGroups() {
     this.groupService.getGroupsByUserId().subscribe(
       {
         next: (response: any) => {
@@ -67,10 +132,14 @@ export class ChatComponent implements OnInit {
           if (this.groups.length === 0) {
             this.openGroupDialog();
           } else {
-            this.channelId = this.groups[0].groupId;
-
+            this.groupId = this.groups[0].groupId;
+            
+            this.loadUsersInGroup();
+            
+            //Ahora traer los canales
+            this.loadChannels();
             //Ahora traer la información del usuario
-            if(loadUser) this.loadUserInfo();
+            this.loadUserInfo();
           }
         },
         error: (error: any) => {
@@ -84,9 +153,12 @@ export class ChatComponent implements OnInit {
     this.userService.getUser().subscribe(
       user => {
         this.username = user.username;
+        this.currentUserId = user.userId;
+        this.avatar = user.avatar;
+        console.log(user);
+        this.checkIfAdmin();
         // this.avatar = user.avatar;
         this.showUsernameModal = false; // Asumiendo que ya está autenticado
-        this.loadMessages();
       },
       error => {
         console.error('Error fetching user data', error);
@@ -120,7 +192,7 @@ export class ChatComponent implements OnInit {
       const message = {
         groupId: this.groupId,
         channelId: this.channelId,
-        userId: 'currentUserId', // Reemplaza esto con la lógica para obtener el userId del usuario autenticado
+        userId: this.currentUserId, // Reemplaza esto con la lógica para obtener el userId del usuario autenticado
         username: this.username,
         avatar: this.avatar,
         text: this.newMessage,
@@ -178,12 +250,16 @@ export class ChatComponent implements OnInit {
     
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      this.loadGroups(false);
+      this.loadGroups();
     });
   }
 
   openChannelDialog() {
-    this.showChannelModal = true;
+    const dialogRef = this.dialog.open(JoinCreateChannelComponent, {
+      width: '400px',
+      height: 'auto',
+      data: { groupId: this.groupId }
+    });
   }
 
   switchChannelMode() {
@@ -207,46 +283,30 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  checkInviteCode() {
-    if (this.joinChannelForm.controls['inviteCode'].valid) {
-      const inviteCode = this.joinChannelForm.controls['inviteCode'].value;
-      this.channelService.getChannelByInviteCode(inviteCode).subscribe(
-        response => {
-          this.channelDetails = response;
-          this.channelNotFound = false;
-        },
-        error => {
-          this.channelDetails = null;
-          this.channelNotFound = true;
-        }
-      );
-    }
-  }
-
-  joinChannel() {
-    if (this.channelDetails && this.joinChannelForm.valid) {
-      this.channelService.joinChannel({ channelId: this.channelDetails.channelId }).subscribe(
-        response => {
-          console.log('Joined channel:', response);
-          this.showChannelModal = false;
-          this.loadChannels();
-        },
-        error => {
-          console.error('Error joining channel:', error);
-        }
-      );
-    }
-  }
-
   changeGroup(groupId: string) {
     this.groupId = groupId;
     this.loadChannels();
+    this.loadUsersInGroup();
+    this.checkIfAdmin();
+  }
+
+  checkIfAdmin() {
+    this.groups.forEach(group => {
+      if (group.groupId === this.groupId) {
+        this.isAdmin = group.admins.includes(this.currentUserId);
+      }
+    });
   }
 
   loadChannels() {
     if (this.groupId) {
       this.channelService.getChannelsByGroupId(this.groupId).subscribe(channels => {
         this.channels = channels;
+        this.channelId = this.channels[0].channelId;
+        console.log('Canales:', this.channels);
+        this.channelName = this.channels[0].name;
+        //Ahora traer los mensajes
+        this.loadMessages();
       });
     }
   }
@@ -254,7 +314,42 @@ export class ChatComponent implements OnInit {
   changeChannel(channelId: string) {
     console.log('Cambiando a canal:', channelId);
     this.channelId = channelId;
+    this.channelName = this.channels.find(channel => channel.channelId === channelId)?.name || '';
     this.loadMessages();
   }
 
+  loadUsersInGroup() {
+    this.groupService.getUsersInGroup(this.groupId).subscribe(
+      users => {
+        const usersId = users;
+        this.users = [];
+        usersId.forEach((userId: string) => {
+          this.userService.getUserById(userId).subscribe(
+            user => {
+              this.users.push(user);
+            }
+          );
+      },
+        (error: any) => {
+        console.error('Error fetching users in group', error);
+      });
+    });
+  }
+
+  kickUser(userId: string) {
+    this.groupService.kickUserFromGroup(this.groupId, userId).subscribe(
+      response => {
+        console.log('User kicked:', response);
+        this.loadUsersInGroup();
+      },
+      error => {
+        console.error('Error kicking user:', error);
+      }
+    );
+  }
+
+  copyCode() {
+    navigator.clipboard.writeText(this.groups.find(group => group.groupId === this.groupId)?.inviteCode ?? '');
+    this.snackBar.open('Código copiado al portapapeles', 'Cerrar',  { duration: 2000 });
+  }
 }

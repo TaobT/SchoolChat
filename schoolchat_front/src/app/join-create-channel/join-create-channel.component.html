@@ -1,41 +1,16 @@
-<h2 mat-dialog-title>{{ isCreatingChannel ? 'Crear Canal' : 'Unirse a Canal' }}</h2>
+<h2 mat-dialog-title>Crear Canal</h2>
 
 <mat-dialog-content>
-  <button mat-button (click)="switchMode()">
-    {{ isCreatingChannel ? 'Unirse a Canal' : 'Crear Canal' }}
-  </button>
-
-  <div *ngIf="isCreatingChannel">
+  <div>
     <form [formGroup]="createChannelForm" (ngSubmit)="createChannel()">
       <mat-form-field appearance="fill">
         <mat-label>Nombre del Canal</mat-label>
-        <input matInput formControlName="name">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>URL de la Foto</mat-label>
-        <input matInput formControlName="photoUrl">
+        <input matInput formControlName="name" title="Nombre Canal">
       </mat-form-field>
       <button mat-raised-button color="primary" type="submit" [disabled]="createChannelForm.invalid">Crear Canal</button>
     </form>
   </div>
 
-  <div *ngIf="!isCreatingChannel">
-    <form [formGroup]="joinChannelForm" (ngSubmit)="joinChannel()">
-      <mat-form-field appearance="fill">
-        <mat-label>Código de Invitación</mat-label>
-        <input matInput formControlName="inviteCode" (input)="checkInviteCode()">
-      </mat-form-field>
-      <div *ngIf="channelDetails">
-        <h3>Detalles del Canal:</h3>
-        <p>Nombre: {{ channelDetails.name }}</p>
-        <img [src]="channelDetails.photoUrl" alt="Foto del Canal">
-      </div>
-      <div *ngIf="channelNotFound">
-        <p>Canal no encontrado</p>
-      </div>
-      <button mat-raised-button color="primary" type="submit" [disabled]="!channelDetails">Unirse al Canal</button>
-    </form>
-  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions>

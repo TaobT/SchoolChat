@@ -12,5 +12,7 @@ router.put('/:groupId', authMiddleware, groupController.updateGroup);
 router.delete('/:groupId', authMiddleware, groupController.deleteGroup);
 router.get('/user/groups', authMiddleware, groupController.getGroupsByUserId);
 router.get('/invite/:inviteCode', authMiddleware, groupController.getGroupByInviteCode);
+router.get('/:groupId/users', groupController.getUsersInGroup);
+router.delete('/:groupId/kick/:userId', authMiddleware, groupController.kickUserFromGroup);
 
 module.exports = router;

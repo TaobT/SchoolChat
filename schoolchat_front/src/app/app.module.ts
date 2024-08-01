@@ -28,6 +28,9 @@ import { ChatComponent } from './componentes/chat/chat.component';
 import { JoinCreateGroupComponent } from './join-create-group/join-create-group.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { JoinCreateChannelComponent } from './join-create-channel/join-create-channel.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -47,6 +50,7 @@ export function tokenGetter() {
     JoinCreateChannelComponent,
   ],
   imports: [
+    MatMenuModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,
@@ -63,6 +67,8 @@ export function tokenGetter() {
     HttpClientModule,
     MatDialogModule,
     MatCardModule,
+    MatGridListModule,
+    MatSnackBarModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
