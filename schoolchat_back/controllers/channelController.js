@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const Channel = require('../models/channelModel');
 const { getWss } = require('../middlewares/websocket');
+const WebSocket = require('ws');
 
 // Controlador para crear un canal
 exports.createChannel = async (req, res) => {
@@ -61,3 +62,4 @@ exports.getChannelById = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener canal', error });
   }
 };
+

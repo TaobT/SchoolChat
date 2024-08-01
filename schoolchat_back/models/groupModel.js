@@ -58,10 +58,10 @@ const Group = {
     };
     try {
       const result = await dynamoDB.update(params).promise();
-      console.log('Grupo actualizado:', result);
+      // console.log('Grupo actualizado:', result);
       return result;
     } catch (error) {
-      console.error('Error al actualizar grupo:', error);
+      // console.error('Error al actualizar grupo:', error);
       throw error;
     }
   },

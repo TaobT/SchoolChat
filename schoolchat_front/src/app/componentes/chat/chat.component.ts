@@ -67,6 +67,7 @@ export class ChatComponent implements OnInit {
 
   ngOnInit() {
     this.showUsernameModal = false;
+    console.log('Loading groups. OnInit...')
     this.loadGroups();
     this.connectToWebSocket();
   }
@@ -117,14 +118,13 @@ export class ChatComponent implements OnInit {
   }
 
   handleUser(message: any) {
-    if(message.userId === this.currentUserId) return;
     if (message.groupId === this.groupId ) {
-      this.loadUsersInGroup();
+      // this.loadUsersInGroup();
     }
     this.loadGroups();
   }
 
-  loadGroups() {
+  loadGroups(loadUsers: boolean = true) {
     this.groupService.getGroupsByUserId().subscribe(
       {
         next: (response: any) => {
@@ -134,7 +134,7 @@ export class ChatComponent implements OnInit {
           } else {
             this.groupId = this.groups[0].groupId;
             
-            this.loadUsersInGroup();
+            if(loadUsers) this.loadUsersInGroup();
             
             //Ahora traer los canales
             this.loadChannels();
@@ -250,7 +250,7 @@ export class ChatComponent implements OnInit {
     
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      this.loadGroups();
+      // this.loadGroups();
     });
   }
 
@@ -319,14 +319,17 @@ export class ChatComponent implements OnInit {
   }
 
   loadUsersInGroup() {
+    this.users = [];
     this.groupService.getUsersInGroup(this.groupId).subscribe(
       users => {
         const usersId = users;
+        console.log('Users in group:', usersId);
         this.users = [];
         usersId.forEach((userId: string) => {
           this.userService.getUserById(userId).subscribe(
             user => {
               this.users.push(user);
+              console.log('User:', user.username);
             }
           );
       },
@@ -340,7 +343,7 @@ export class ChatComponent implements OnInit {
     this.groupService.kickUserFromGroup(this.groupId, userId).subscribe(
       response => {
         console.log('User kicked:', response);
-        this.loadUsersInGroup();
+        // this.loadUsersInGroup();
       },
       error => {
         console.error('Error kicking user:', error);
