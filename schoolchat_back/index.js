@@ -45,10 +45,14 @@ try {
   
   const options = {
     key: privateKey,
-    cert: certificate,
-    secureOptions: require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_TLSv1_1
+    cert: certificate
   };
   var httpsServer = https.createServer(options, app);
+  
+  httpsServer.listen(PORT, () => {
+    console.log(`HTTPS Server is running on port ${PORT}`);
+  });
+
   wss = new WebSocket.Server({ server: httpsServer });
     wss.on('connection', function connection(ws) {
       console.log('Client connected');
@@ -58,10 +62,6 @@ try {
       });
     });
   
-  httpsServer.listen(PORT, () => {
-    console.log(`HTTPS Server is running on port ${PORT}`);
-  });
-
   setWss(wss);
 }
 catch (e) {
@@ -70,6 +70,11 @@ catch (e) {
   
   const httpServer = http.createServer(app);
 
+  
+  httpServer.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+  
   wss = new WebSocket.Server({ server: httpServer });
   wss.on('connection', function connection(ws) {
     console.log('Client connected');
@@ -78,11 +83,6 @@ catch (e) {
       console.log('Client disconnected');
     });
   });
-
-  httpServer.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-
   setWss(wss);
 
 }
