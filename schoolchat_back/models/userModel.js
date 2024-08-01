@@ -8,9 +8,7 @@ const User = {
     };
     try {
       await dynamoDB.put(params).promise();
-      console.log('Usuario creado:', user);
     } catch (error) {
-      console.error('Error al crear usuario:', error);
       throw error;
     }
   },
