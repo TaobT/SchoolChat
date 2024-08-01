@@ -57,6 +57,8 @@ try {
     wss.on('connection', function connection(ws) {
       console.log('Client connected');
 
+      ws.on('error', console.error);
+
       ws.on('close', function close() {
         console.log('Client disconnected');
       });
@@ -78,6 +80,8 @@ catch (e) {
   wss = new WebSocket.Server({ server: httpServer });
   wss.on('connection', function connection(ws) {
     console.log('Client connected');
+
+    ws.on('error', console.error);
 
     ws.on('close', function close() {
       console.log('Client disconnected');
