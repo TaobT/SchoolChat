@@ -1,4 +1,5 @@
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
 import { MessageService } from '../../services/message.service';
 import { GroupService } from '../../services/group.service';
@@ -13,6 +14,10 @@ import { JoinCreateChannelComponent } from '../../join-create-channel/join-creat
 import { User } from '../../models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+// Importar operadores de RxJS
+import { map, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -20,8 +25,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ChatComponent implements OnInit {
   @ViewChild('messageContainer') messageContainer!: ElementRef;
-  messages: { user: string, avatar: string, text: string, time: string }[] = [];
+  messages: { user: string, avatar: string, text: string, time: string, imageUrl?: string }[] = [];
   newMessage: string = '';
+  selectedFile: File | null = null; // Para almacenar el archivo seleccionado
   username: string | null = null;
   currentUserId: string = '';
   isAdmin: boolean = false;
@@ -34,8 +40,9 @@ export class ChatComponent implements OnInit {
   groupId: string = ''; // ID del grupo actual
   channelId: string = ''; // ID del canal actual
   channelName: string = ''; // Nombre del canal actual
-  
-  //WebSocket
+  imageUrl: string = '';
+
+  // WebSocket
   private socket: WebSocket | null = null;
 
   groups: Group[] = [];
@@ -54,7 +61,8 @@ export class ChatComponent implements OnInit {
     public dialog: MatDialog,
     private groupService: GroupService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private http: HttpClient
   ) {
     this.createChannelForm = this.fb.group({
       name: ['', Validators.required]
@@ -92,8 +100,6 @@ export class ChatComponent implements OnInit {
         default:
           console.log('Unknown message type:', message.type);
       }
-
-      
     }
   }
 
@@ -103,7 +109,8 @@ export class ChatComponent implements OnInit {
         user: message.username,
         avatar: message.avatar,
         text: message.text,
-        time: new Date(message.timestamp).toLocaleTimeString()
+        time: new Date(message.timestamp).toLocaleTimeString(),
+        imageUrl: message.imageUrl
       });
       setTimeout(() => {
         this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
@@ -123,6 +130,7 @@ export class ChatComponent implements OnInit {
     }
     this.loadGroups();
   }
+
 
   loadGroups(loadUsers: boolean = true) {
     this.groupService.getGroupsByUserId().subscribe(
@@ -145,8 +153,11 @@ export class ChatComponent implements OnInit {
         error: (error: any) => {
           console.error('Error al obtener grupos:', error);
         }
+      },
+      error: (error: any) => {
+        console.error('Error al obtener grupos:', error);
       }
-    );
+    });
   }
 
   loadUserInfo() {
@@ -157,12 +168,11 @@ export class ChatComponent implements OnInit {
         this.avatar = user.avatar;
         console.log(user);
         this.checkIfAdmin();
-        // this.avatar = user.avatar;
-        this.showUsernameModal = false; // Asumiendo que ya está autenticado
+        this.showUsernameModal = false;
       },
       error => {
         console.error('Error fetching user data', error);
-        this.showUsernameModal = true; // Mostrar el modal si no se pudo obtener el usuario
+        this.showUsernameModal = true;
         this.username = '';
       }
     );
@@ -175,7 +185,8 @@ export class ChatComponent implements OnInit {
           user: message.username,
           avatar: message.avatar,
           text: message.text,
-          time: new Date(message.timestamp).toLocaleTimeString()
+          time: new Date(message.timestamp).toLocaleTimeString(),
+          imageUrl: message.imageUrl
         }));
         setTimeout(() => {
           this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
@@ -188,35 +199,64 @@ export class ChatComponent implements OnInit {
   }
 
   sendMessage() {
-    if (this.newMessage.trim() && this.username !== null) {
-      const message = {
+    if (this.newMessage.trim() || this.imageUrl.trim()) {
+      const message: any = {
         groupId: this.groupId,
         channelId: this.channelId,
-        userId: this.currentUserId, // Reemplaza esto con la lógica para obtener el userId del usuario autenticado
+        userId: this.currentUserId,
         username: this.username,
         avatar: this.avatar,
         text: this.newMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        imageUrl: this.imageUrl.trim() || null //Solo si se propociona la imagen
       };
-
-      this.messageService.createMessage(message).subscribe(
-        response => {
-          this.messages.push({
-            user: this.username!,
-            avatar: this.avatar,
-            text: this.newMessage,
-            time: new Date().toLocaleTimeString()
-          });
-          this.newMessage = '';
-          setTimeout(() => {
-            this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
-          }, 0);
-        },
-        error => {
-          console.error('Error sending message', error);
-        }
-      );
+  
+      this.createMessage(message);
+  
+      this.newMessage = '';
+      this.imageUrl = ''; // Limpia la URL de la imagen
     }
+  }
+ 
+  createMessage(message: any) {
+    this.messageService.createMessage(message).subscribe(
+      response => {
+        this.messages.push({
+          user: this.username!,
+          avatar: this.avatar,
+          text: this.newMessage,
+          time: new Date().toLocaleTimeString(),
+          imageUrl: message.imageUrl // Asegúrate de incluir `imageUrl`
+        });
+        setTimeout(() => {
+          this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+        }, 0);
+      },
+      error => {
+        console.error('Error sending message', error);
+      }
+    );
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
+  uploadImage(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    return this.http.post<{ url: string }>(`${environment.apiUrl}/api/upload/upload`, formData)
+      .pipe(
+        map(response => response.url),
+        catchError(error => {
+          console.error('Error uploading image:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   setUsername() {
@@ -247,7 +287,7 @@ export class ChatComponent implements OnInit {
       width: '400px',
       height: 'auto'
     });
-    
+
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
       // this.loadGroups();
@@ -305,7 +345,6 @@ export class ChatComponent implements OnInit {
         this.channelId = this.channels[0].channelId;
         console.log('Canales:', this.channels);
         this.channelName = this.channels[0].name;
-        //Ahora traer los mensajes
         this.loadMessages();
       });
     }
@@ -332,11 +371,12 @@ export class ChatComponent implements OnInit {
               console.log('User:', user.username);
             }
           );
-      },
+        },
         (error: any) => {
-        console.error('Error fetching users in group', error);
-      });
-    });
+          console.error('Error fetching users in group', error);
+        });
+      }
+    );
   }
 
   kickUser(userId: string) {
@@ -353,6 +393,6 @@ export class ChatComponent implements OnInit {
 
   copyCode() {
     navigator.clipboard.writeText(this.groups.find(group => group.groupId === this.groupId)?.inviteCode ?? '');
-    this.snackBar.open('Código copiado al portapapeles', 'Cerrar',  { duration: 2000 });
+    this.snackBar.open('Código copiado al portapapeles', 'Cerrar', { duration: 2000 });
   }
 }

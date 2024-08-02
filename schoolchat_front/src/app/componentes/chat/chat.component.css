@@ -30,6 +30,17 @@ html, body {
   margin-right: 250px;
 }
 
+.message-image-container {
+  margin-top: 10px;
+}
+
+.message-image {
+  max-width: 20%;
+  height: auto;
+  border-radius: 4px;
+}
+
+
 .chat-header {
   background-color: #2f3136;
   border-bottom: 1px solid #202225;
@@ -241,7 +252,6 @@ html, body {
   width: 100%;
   margin-top: 1rem;
 }
-
 
 .sidebar-channels {
   width: 200px;

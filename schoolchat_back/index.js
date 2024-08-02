@@ -11,7 +11,8 @@ const https = require('https');
 const http = require('http');
 const app = express();
 const WebSocket = require('ws');
-const { setWss } = require('./middlewares/websocket')
+const { setWss } = require('./middlewares/websocket');
+const path = require('path');
 
 let wss;
 const allowedOrigins = ['https://localhost:4200', 'http://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com']; // Agrega los orígenes permitidos aquí

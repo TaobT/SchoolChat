@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { PrimengModule } from './primeng/primeng.module';
+import { DialogModule } from 'primeng/dialog';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -31,6 +32,7 @@ import { JoinCreateChannelComponent } from './join-create-channel/join-create-ch
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { FooterComponent } from './componentes/footer/footer.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -48,6 +50,7 @@ export function tokenGetter() {
     NavbarComponent,
     JoinCreateGroupComponent,
     JoinCreateChannelComponent,
+    FooterComponent,
   ],
   imports: [
     MatMenuModule,
@@ -55,6 +58,7 @@ export function tokenGetter() {
     AppRoutingModule,
     FormsModule,
     PrimengModule,
+    DialogModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     RouterModule,
