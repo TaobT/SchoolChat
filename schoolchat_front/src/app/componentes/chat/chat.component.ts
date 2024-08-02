@@ -153,11 +153,8 @@ export class ChatComponent implements OnInit {
         error: (error: any) => {
           console.error('Error al obtener grupos:', error);
         }
-      },
-      error: (error: any) => {
-        console.error('Error al obtener grupos:', error);
       }
-    });
+    );
   }
 
   loadUserInfo() {
