@@ -3,6 +3,7 @@ const Group = require('../models/groupModel');
 const User = require('../models/userModel');
 const Channel = require('../models/channelModel');
 const { getWss } = require('../middlewares/websocket');
+const WebSocket = require('ws');
 
 exports.createGroup = async (req, res) => {
   const { name, photoUrl } = req.body;
@@ -185,6 +186,7 @@ exports.kickUserFromGroup = async (req, res) => {
 
     res.status(200).json({ message: 'Usuario expulsado del grupo' });
   } catch (error) {
+    console.log('Error al expulsar usuario:', error);
     res.status(500).json({ error });
   }
 }

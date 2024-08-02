@@ -72,7 +72,7 @@ export class JoinCreateGroupComponent {
       this.groupService.joinGroup(this.joinGroupForm.value).subscribe(
         response => {
           console.log('Te has unido al grupo:', response);
-          this.dialogRef.close();
+          this.dialogRef.close({success: true});
         },
         error => {
           console.error('Error al unirse al grupo:', error);

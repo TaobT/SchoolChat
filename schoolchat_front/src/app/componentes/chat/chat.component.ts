@@ -75,6 +75,7 @@ export class ChatComponent implements OnInit {
 
   ngOnInit() {
     this.showUsernameModal = false;
+    console.log('Loading groups. OnInit...')
     this.loadGroups();
     this.connectToWebSocket();
   }
@@ -124,24 +125,33 @@ export class ChatComponent implements OnInit {
   }
 
   handleUser(message: any) {
-    if (message.userId === this.currentUserId) return;
-    if (message.groupId === this.groupId) {
-      this.loadUsersInGroup();
+    if (message.groupId === this.groupId ) {
+      // this.loadUsersInGroup();
     }
     this.loadGroups();
   }
 
-  loadGroups() {
-    this.groupService.getGroupsByUserId().subscribe({
-      next: (response: any) => {
-        this.groups = response;
-        if (this.groups.length === 0) {
-          this.openGroupDialog();
-        } else {
-          this.groupId = this.groups[0].groupId;
-          this.loadUsersInGroup();
-          this.loadChannels();
-          this.loadUserInfo();
+
+  loadGroups(loadUsers: boolean = true) {
+    this.groupService.getGroupsByUserId().subscribe(
+      {
+        next: (response: any) => {
+          this.groups = response;
+          if (this.groups.length === 0) {
+            this.openGroupDialog();
+          } else {
+            this.groupId = this.groups[0].groupId;
+            
+            if(loadUsers) this.loadUsersInGroup();
+            
+            //Ahora traer los canales
+            this.loadChannels();
+            //Ahora traer la información del usuario
+            this.loadUserInfo();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error al obtener grupos:', error);
         }
       },
       error: (error: any) => {
@@ -280,7 +290,7 @@ export class ChatComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      this.loadGroups();
+      // this.loadGroups();
     });
   }
 
@@ -348,14 +358,17 @@ export class ChatComponent implements OnInit {
   }
 
   loadUsersInGroup() {
+    this.users = [];
     this.groupService.getUsersInGroup(this.groupId).subscribe(
       users => {
         const usersId = users;
+        console.log('Users in group:', usersId);
         this.users = [];
         usersId.forEach((userId: string) => {
           this.userService.getUserById(userId).subscribe(
             user => {
               this.users.push(user);
+              console.log('User:', user.username);
             }
           );
         },
@@ -370,7 +383,7 @@ export class ChatComponent implements OnInit {
     this.groupService.kickUserFromGroup(this.groupId, userId).subscribe(
       response => {
         console.log('User kicked:', response);
-        this.loadUsersInGroup();
+        // this.loadUsersInGroup();
       },
       error => {
         console.error('Error kicking user:', error);
