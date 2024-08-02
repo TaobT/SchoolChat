@@ -11,6 +11,7 @@ interface Message {
   avatar: string;
   text: string;
   timestamp: string;
+  imageUrl?: string; 
 }
 
 @Injectable({

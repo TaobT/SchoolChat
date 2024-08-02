@@ -1,8 +1,8 @@
 <!-- Contenedor principal de chat -->
 <div class="sidebar">
   <ul>
-    <li *ngFor="let group of groups"  [class.selected]="group.groupId === groupId">
-      <img src="{{group.photoUrl}}" alt="{{group.name}}" (click)="changeGroup(group.groupId)">
+    <li *ngFor="let group of groups" [class.selected]="group.groupId === groupId">
+      <img [src]="group.photoUrl" [alt]="group.name" (click)="changeGroup(group.groupId)">
     </li>
   </ul>
   <button pButton type="button" icon="pi pi-plus" (click)="openGroupDialog()" title="Nuevo Grupo"></button>
@@ -13,7 +13,6 @@
   <div class="chat">
     <div class="chat-header">
       <h2>{{channelName}}</h2>
-      <!--<button class="change-user-button" (click)="changeUsername()">Change User</button>-->
     </div>
     <div class="chat-messages" #messageContainer>
       <div class="message" *ngFor="let message of messages">
@@ -23,12 +22,17 @@
         <div class="message-content">
           <div class="message-user">{{ message.user }}</div>
           <div class="message-text">{{ message.text }}</div>
+          <!-- Agregar la imagen si existe -->
+          <div class="message-image-container" *ngIf="message.imageUrl">
+            <img [src]="message.imageUrl" alt="Message Image" class="message-image">
+          </div>
           <div class="message-time">{{ message.time }}</div>
         </div>
       </div>
     </div>
     <div class="chat-input">
       <input [(ngModel)]="newMessage" placeholder="Type your message..." (keyup.enter)="sendMessage()">
+      <input type="text" [(ngModel)]="imageUrl" placeholder="Enter image URL (optional)">
       <button (click)="sendMessage()">Send</button>
     </div>
   </div>
@@ -42,7 +46,7 @@
     <button pButton type="button" icon="pi pi-plus" (click)="openChannelDialog()" title="Nuevo Canal"></button>
     <div class="invitation-code">
       <h2>Invitar</h2>
-      <button pButton type="button" icon="pi pi-copy" (click)="copyCode()" title="Copiar Codigo"></button>
+      <button pButton type="button" icon="pi pi-copy" (click)="copyCode()" title="Copiar Código"></button>
     </div>
   </div>
   <!-- Lista de usuarios -->
@@ -65,22 +69,22 @@
     </ul>
   </div>
 
-<!-- Modal para ingresar nombre de usuario -->
-<div class="username-modal" *ngIf="showUsernameModal">
-  <div class="modal-content">
-    <h2>Enter your name</h2>
-    <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="setUsername()">
-    <button (click)="setUsername()">Join Chat</button>
+  <!-- Modal para ingresar nombre de usuario -->
+  <div class="username-modal" *ngIf="showUsernameModal">
+    <div class="modal-content">
+      <h2>Enter your name</h2>
+      <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="setUsername()">
+      <button (click)="setUsername()">Join Chat</button>
+    </div>
+  </div>
+
+  <!-- Modal para cambiar nombre de usuario -->
+  <div class="change-user-modal" *ngIf="changeUserModal">
+    <div class="modal-content">
+      <h2>Enter your name</h2>
+      <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="confirmChangeUsername()">
+      <button (click)="confirmChangeUsername()">Join Chat</button>
+      <button (click)="cancelChangeUsername()">Cancel</button>
+    </div>
   </div>
 </div>
-
-<!-- Modal para cambiar nombre de usuario -->
-<div class="change-user-modal" *ngIf="changeUserModal">
-  <div class="modal-content">
-    <h2>Enter your name</h2>
-    <input [(ngModel)]="tempUsername" placeholder="Your name" (keyup.enter)="confirmChangeUsername()">
-    <button (click)="confirmChangeUsername()">Join Chat</button>
-    <button (click)="cancelChangeUsername()">Cancel</button>
-  </div>
-</div>
-
