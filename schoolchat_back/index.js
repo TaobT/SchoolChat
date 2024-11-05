@@ -15,7 +15,9 @@ const { setWss } = require('./middlewares/websocket');
 const path = require('path');
 
 let wss;
-const allowedOrigins = ['https://localhost:4200', 'http://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com']; // Agrega los orígenes permitidos aquí
+const allowedOrigins = ['https://localhost:4200', 'http://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com', 'https://18.222.28.159:3000', 'http://localhost:80', 'http://localhost', 'http://localhost:3000', 'localhost']; // Agrega los orígenes permitidos aquí
+
+console.log('Allowed origins: ', allowedOrigins);
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -27,6 +29,11 @@ const corsOptions = {
   },
   credentials: true, // Habilita el intercambio de cookies (si es necesario)
 };
+
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
