@@ -1,28 +1,52 @@
 services:
- back:
-  build:
-    context: ./schoolchat_back
-    dockerfile: Dockerfile
-  ports: 
-    - "3000:3000"
-  restart: always
- 
- front:
-  build:
-    context: ./schoolchat_front
-    dockerfile: Dockerfile
-  depends_on:
+ front: # Servicio para el frontend
+  build: # Construir la imagen del servicio front
+    context: ./schoolchat_front # Ubicacion del Dockerfile
+    dockerfile: Dockerfile # Nombre del Dockerfile
+  depends_on: # Dependencia del servicio back
     - back
   ports: 
-    - "80:80"
-  restart: always
+    - "80:80" # Puerto de la aplicacion
+  restart: always # Reiniciar el contenedor en caso de fallo
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5' # Limite de CPU
+        memory: 256M # Limite de memoria
+      reservations:
+        cpus: '0.25' # Reserva de CPU
+        memory: 128M # Reserva de memoria
+
+ back: # Servicio para el backend
+  build:
+    context: ./schoolchat_back # Ubicacion del Dockerfile
+    dockerfile: Dockerfile # Nombre del Dockerfile
+  ports: 
+    - "3000:3000" # Puerto de la aplicacion
+  restart: always # Reiniciar el contenedor en caso de fallo
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5' # Limite de CPU
+        memory: 512M # Limite de memoria
+      reservations:
+        cpus: '0.25' # Reserva de CPU
+        memory: 256M # Reserva de memoria
  
- db:
-  image: amazon/dynamodb-local
+ db: # Servicio para la base de datos
+  image: amazon/dynamodb-local # Imagen de la base de datos DynamoDB
   ports:
-    - "4000:8000"
+    - "4000:8000" # Puerto de la base de datos
   environment:
-    - AWS_REGION=us-west-2
-    - AWS_ACCESS_KEY_ID=ACCESSKEY
-    - AWS_SECRET_ACCESS_KEY=SECRETKEY
-  restart: always
+    - AWS_REGION=us-west-2 # Region de la base de datos
+    - AWS_ACCESS_KEY_ID=ACCESSKEY # Claves de acceso
+    - AWS_SECRET_ACCESS_KEY=SECRETKEY # Claves de acceso
+  restart: always # Reiniciar el contenedor en caso de fallo
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5' # Limite de CPU
+        memory: 512M # Limite de memoria
+      reservations:
+        cpus: '0.25' # Reserva de CPU
+        memory: 256M # Reserva de memoria
