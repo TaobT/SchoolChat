@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schoolchat-back-deployment
+spec:
+  selector:
+    matchLabels:
+      app: schoolchat-back
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: schoolchat-back
+    spec:
+      containers:
+        - name: schoolchat-back
+          image: schoolchat_back:0.0.1
+          ports:
+            - containerPort: 3000
+              name: billingappback

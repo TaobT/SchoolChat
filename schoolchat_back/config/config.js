@@ -8,11 +8,11 @@ AWS.config.update({
 });
 
 const dynamo = new AWS.DynamoDB({
-  endpoint: 'http://db:8000' // Asegúrate de que esta URL es correcta
+  endpoint: 'http://dynamodb-local:8000' // Asegúrate de que esta URL es correcta
 });
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient({
-  endpoint: 'http://db:8000'
+  endpoint: 'http://dynamodb-local:8000'
 });
 
 module.exports = {

@@ -15,7 +15,19 @@ const { setWss } = require('./middlewares/websocket');
 const path = require('path');
 
 let wss;
-const allowedOrigins = ['https://localhost:4200', 'http://localhost:4200', 'https://18.222.28.159', 'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com', 'https://18.222.28.159:3000', 'http://localhost:80', 'http://localhost', 'http://localhost:3000', 'localhost']; // Agrega los orígenes permitidos aquí
+const allowedOrigins = ['https://localhost:4200', 
+  'http://localhost:4200', 
+  'https://18.222.28.159', 
+  'https://ec2-18-222-28-159.us-east-2.compute.amazonaws.com', 
+  'https://18.222.28.159:3000', 
+  'http://localhost:80', 
+  'http://localhost', 
+  'http://localhost:3000', 
+  'localhost',
+  'http://192.168.49.2:30100',  // IP de Minikube y puerto nodePort
+  'http://192.168.49.2',        // Solo IP de Minikube
+  'ws://192.168.49.2:30100'    // URL de WebSocket para Minikube
+]; // Agrega los orígenes permitidos aquí
 
 console.log('Allowed origins: ', allowedOrigins);
 

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamodb-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dynamodb-local
+  template:
+    metadata:
+      labels:
+        app: dynamodb-local
+    spec:
+      containers:
+        - name: dynamodb-local
+          image: amazon/dynamodb-local
+          args: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/home/dynamodblocal/data"]
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_REGION
+              value: "us-west-2"
+            - name: AWS_ACCESS_KEY_ID
+              value: "ACCESSKEY"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "SECRETKEY"
+          volumeMounts:
+            - mountPath: /home/dynamodblocal/data  # Ruta dentro del contenedor donde DynamoDB Local guarda los datos
+              name: dynamodb-local-storage
+              subPath: data
+      volumes:
+        - name: dynamodb-local-storage
+          persistentVolumeClaim:
+            claimName: dynamodb-local-pvc
